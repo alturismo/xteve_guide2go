@@ -18,7 +18,7 @@ while /mnt/user/appdata/ should fit to your system path ...
 ```
 docker run -d \
   --name=xteve_guide2go \
-  --net=bridge \
+  --net=host \
   --log-opt max-size=10m \
   --log-opt max-file=3 \
   -e TZ="Europe/Berlin" \
