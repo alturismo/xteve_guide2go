@@ -10,7 +10,7 @@ cron and xteve start options are updated on docker restart.
 mounts to use as sample \
 Container Path: /root/.xteve <> /mnt/user/appdata/xteve/ \
 Container Path: /config <> /mnt/user/appdata/xteve/_config/ \
-Container Path: /guide2go <> /mnt/user/appdata/xteve/guide2go/ \
+Container Path: /guide2go <> /mnt/user/appdata/xteve/_guide2go/ \
 Container Path: /tmp/xteve <> /tmp/xteve/ \
 Container Path: /TVH <> /mnt/user/appdata/tvheadend/data/ << not needed if no TVHeadend is used \
 while /mnt/user/appdata/ should fit to your system path ...
