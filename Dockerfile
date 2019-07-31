@@ -23,8 +23,8 @@ VOLUME /root/.xteve
 VOLUME /tmp/xteve
 
 # Add xTeve and guide2go
-#ADD https://xteve.de:9443/download/?os=linux&arch=amd64&name=xteve&beta=false /usr/bin/xteve
-ADD xteve /usr/bin/xteve
+RUN wget https://github.com/xteve-project/xTeVe-Downloads/raw/master/xteve_linux_amd64.zip -O temp.zip; unzip temp.zip -d /usr/bin/; rm temp.zip
+#ADD xteve /usr/bin/xteve
 ADD guide2go /usr/bin/guide2go
 ADD cronjob.sh /
 ADD entrypoint.sh /
