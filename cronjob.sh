@@ -10,7 +10,7 @@ use_TVH_Play="no"
 use_TVH_move="no"
 
 ### List of created lineup json files in /guide2go
-# sample with 3 jsons lineups
+# sample with 3 jsons lineups, adjust to yours
 JsonList="CBLguide.json SATguide.json SATSport.json"
 
 ### to create your lineups do as follows and follow the instructions
