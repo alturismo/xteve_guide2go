@@ -30,8 +30,8 @@ docker run -d \
   alturismo/xteve_guide2go
 ```
 
-setup guide2go SD subscrition as follows or copy your existing .json files into your mounted /guide2go folder \
-docker exec -it "dockername" guide2go -configure /guide2go/"your_epg_name".json
+setup guide2go SD subscrition as follows or copy your existing .yaml files into your mounted /guide2go folder \
+docker exec -it "dockername" guide2go -configure /guide2go/"your_epg_name".yaml
 
 to test the cronjob functions \
 docker exec -it "dockername" ./config/cronjob.sh
