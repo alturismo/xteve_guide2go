@@ -127,4 +127,6 @@ if [ "$use_plexAPI" = "yes" ]; then
 	fi
 fi
 
+chown -R 99:100 /root/.xteve
+
 exit
