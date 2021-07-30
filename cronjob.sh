@@ -4,6 +4,7 @@
 
 use_guide2go="yes"
 use_xTeveAPI="yes"
+use_xTeveRP="no"
 use_embyAPI="no"
 use_plexAPI="no"
 use_TVH_Play="no"
@@ -20,6 +21,16 @@ JsonList="CBLguide.yaml SATguide.yaml SATSport.yaml"
 xTeveIP="192.168.1.2"
 xTevePORT="34400"
 
+### setup rewrite rule für Reverse Proxy https xml usage
+# the rewritten url will be then http://yourxtevedomain.de/xmltv/xteverp.xml
+xtevelocal="http://192.168.1.67:34400"
+xteveRP="https://xteve.mydomain.de"
+xtevelocalfile="/root/.xteve/data/xteve.xml"
+xteveRPfile="/root/.xteve/data/xteverp.xml"
+# if wished, a ready RP m3u file generator, url will be http://yourxtevedomain.de/xmltv/xteverp.m3u
+xtevelocalm3ufile="/root/.xteve/data/xteve.m3u"
+xteveRPm3ufile="/root/.xteve/data/xteverp.m3u"
+
 ### Emby ip, Port, apiKey, update ID in case API is used to update EPG directly after guide2go
 # ONLY when xteve API is in use, otherwise obsolete
 # API Key, https://github.com/MediaBrowser/Emby/wiki/Api-Key-Authentication
@@ -27,7 +38,7 @@ xTevePORT="34400"
 embyIP="192.168.1.2"
 embyPORT="8096"
 embyApiKey=""
-embyID="9492d30c70f7f1bec3757c9d0a4feb45"
+embyID="9492d30c70balblac9d0a4feb45"
 
 ### Plex ip, Port, Token, TV Section ID in case API is used to update EPG directly after guide2go
 # ONLY when xteve API is in use, otherwise obsolete
@@ -35,7 +46,7 @@ embyID="9492d30c70f7f1bec3757c9d0a4feb45"
 # plexID, http://YOUR_IP_HERE:32400/?X-Plex-Token=YOUR_TOKEN_HERE , look for "tv.plex.providers.epg.xmltv:  ", sample here 11
 plexIP="192.168.1.2"
 plexPORT="32400"
-plexToken=""
+plexToken="yourtokenhere"
 plexID="11"
 
 ### TVHeadend ip, Port in case m3u Playlist is wanted
@@ -104,6 +115,25 @@ if [ "$use_TVH_move" = "yes" ]; then
 		echo "no Path credential"
 	else
 		cp $TVHSOURCE $TVHPATH/guide.xml
+	fi
+fi
+
+# create rewritten xml and m3u file
+if [ "$use_xTeveRP" = "yes" ]; then
+	if [ -z "$xteveRPfile" ]; then
+		echo "no Path credential"
+	else
+		sleep 10
+		cp $xtevelocalfile $xteveRPfile
+		sed -i "s;$xtevelocal;$xteveRP;g" $xteveRPfile
+		sleep 2
+		gzip -kf $xteveRPfile
+	fi
+	if [ -z "$xteveRPm3ufile" ]; then
+		echo "no Path credential"
+	else
+		cp $xtevelocalm3ufile $xteveRPm3ufile
+		sed -i "s;$xtevelocal;$xteveRP;g" $xteveRPm3ufile
 	fi
 fi
 
