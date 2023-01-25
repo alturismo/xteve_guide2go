@@ -1,6 +1,6 @@
 #!/bin/sh
 
-##### Config
+##### Config new
 
 use_guide2go="yes"		# xml grabber for SD
 use_guide2goproxy="no"		# yes enables proxy functions for images, EITHER use_guide2goproxy OR use_guide2gocache
