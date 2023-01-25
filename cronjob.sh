@@ -2,17 +2,25 @@
 
 ##### Config
 
-use_guide2go="yes"
-use_xTeveAPI="yes"
-use_xTeveRP="no"
-use_embyAPI="no"
-use_plexAPI="no"
-use_TVH_Play="no"
-use_TVH_move="no"
+use_guide2go="yes"		# xml grabber for SD
+use_guide2goproxy="no"		# yes enables proxy functions for images, EITHER use_guide2goproxy OR use_guide2gocache
+use_guide2gocache="yes"		# yes enables proxy functions for images while caching them local
+use_guide2goclean="yes"		# yes checks xml's and will cleanup "old" images, only useful use_guide2gocache=yes ...
+use_xTeveAPI="yes"		# yes enables API update calls after each xml update, may disable xteve's update schedule in webui
+use_embyAPI="no"		# yes enables emby API call to update EPG after each xml update
+use_plexAPI="yes"		# yes enables plex API call to update EPG after each xml update
+use_TVH_Play="no"		# yes will fetch the playlist from tvheadend after each run to keep updated.
+use_TVH_move="yes"		# yes will copy the xml to tvheadend's data dir for easy import, consider proper mount's
 
 ### List of created lineup json files in /guide2go
 # sample with 3 yaml lineups, adjust to yours
 JsonList="CBLguide.yaml SATguide.yaml SATSport.yaml"
+
+# Hostname or ip and port where proxy is reachable from clients, default port 8080, seperated from xteve.
+guide2gohost="xteve"
+guide2goport="8080"
+# if guide2gocache is active, disable guide2goproxy (no) or vice vers
+images_path='/guide2go/images/'
 
 ### to create your lineups do as follows and follow the instructions
 # docker exec -it <yourdockername> guide2go -configure /guide2go/<lineupnamehere>.json
@@ -68,19 +76,51 @@ TVHPATH="/TVH"
 
 # run guide2go in loop
 
-if [ "$use_guide2go" = "yes" ]; then
+f [ "$use_guide2go" = "yes" ]; then
 	for jsons in $JsonList
 		do
+		pkill guide2go
 		jsonefile="${jsons%.*}"
 		filecache='Cache: /guide2go/'$jsonefile'_cache.json'
 		fileoutput='XMLTV: /guide2go/'$jsonefile'.xml'
-		sed -i "/Cache/c \    $filecache" /guide2go/$jsons
+		hostoutput='Hostname: '$guide2gohost':'$guide2goport''
+		sed -i "/  Cache/c \    $filecache" /guide2go/$jsons
 		sed -i "/XMLTV/c \    $fileoutput" /guide2go/$jsons
-		guide2go -config /guide2go/$jsons
+		sed -i "/Hostname/c \    $hostoutput" /guide2go/$jsons
+		sleep 1
+		if [ "$use_guide2goproxy" = "yes" ]; then
+			guide2goproxy='Proxy Images: true'
+			sed -i "/Proxy/c \    $guide2goproxy" /guide2go/$jsons
+		else
+			guide2goproxy='Proxy Images: false'
+			sed -i "/Proxy/c \    $guide2goproxy" /guide2go/$jsons
+		fi
+		if [ "$use_guide2gocache" = "yes" ]; then
+			guide2gocache='Local Images Cache: true'
+			sed -i "/Local/c \    $guide2gocache" /guide2go/$jsons
+			sed -i "/  Images/c \    Images Path: $images_path" /guide2go/$jsons
+		else
+			guide2gocache='Local Images Cache: false'
+			sed -i "/Local/c \    $guide2gocache" /guide2go/$jsons
+		fi
+		sleep 1
+		guide2go -config /guide2go/$jsons &
+		while ! nc -z localhost $guide2goport; do
+			sleep 5
+		done
+		echo "jump to next config.yaml"
 	done
+	echo "done and g2g started listening"
 fi
 
 sleep 1
+
+# cleanup image Dir
+if [ "$use_guide2goclean" = "yes" ]; then
+        cat /guide2go/*.xml | grep -i $guide2gohost:$guide2goport | sed 's/.*images\///' | cut -f1 -d'"' | sort | uniq > /guide2go/listimages
+        sleep 1
+        find $images_path -type f \( ! -name "/guide2go/listimages" $(printf ' -a ! -name %s\n' $(< /guide2go/listimages)) \) -exec rm {} +
+fi
 
 # get TVH playlist
 if [ "$use_TVH_Play" = "yes" ]; then
