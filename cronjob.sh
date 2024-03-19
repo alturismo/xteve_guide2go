@@ -76,7 +76,7 @@ TVHPATH="/TVH"
 
 # run guide2go in loop
 
-f [ "$use_guide2go" = "yes" ]; then
+if [ "$use_guide2go" = "yes" ]; then
 	for jsons in $JsonList
 		do
 		pkill guide2go
